@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createElement } from 'react'
 import { AnnotationEditor } from '@capture/ui'
 import { LocalProvider } from '@capture/storage'
+import { startRegionSelector } from './region-selector'
 
 let overlayRoot: ReturnType<typeof createRoot> | null = null
 
@@ -56,8 +57,14 @@ function injectEditor(dataUrl: string, width: number, height: number, mode: stri
   )
 }
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'SHOW_EDITOR') {
     injectEditor(message.dataUrl, message.width, message.height, message.mode ?? 'visible')
+  }
+  if (message.type === 'START_REGION_SELECTOR') {
+    startRegionSelector()
+      .then(region => sendResponse({ ok: true, region }))
+      .catch(err => sendResponse({ ok: false, error: err.message }))
+    return true // async response
   }
 })

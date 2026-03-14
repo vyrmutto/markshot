@@ -6,7 +6,8 @@
     "dev": "vite build --watch",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "generate-icons": "node scripts/generate-icons.mjs"
+    "generate-icons": "node scripts/generate-icons.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@capture/core": "workspace:*",

@@ -1,5 +1,5 @@
 // packages/extension/src/background/capture-handler.ts
-import { stitchFrames } from '@capture/core'
+import { stitchFrames, cropImageData } from '@capture/core'
 import type { CaptureMode, Region } from '@capture/core'
 
 export interface CaptureRequest {
@@ -12,15 +12,22 @@ export async function handleCapture(
   tabId: number,
   request: CaptureRequest,
 ): Promise<string> {
-  if (request.delayMs) {
+  if (request.delayMs != null && request.delayMs > 0) {
     await new Promise(r => setTimeout(r, request.delayMs))
   }
 
   switch (request.mode) {
     case 'visible':
-    case 'region':
     case 'element': {
       const dataUrl = await chrome.tabs.captureVisibleTab({ format: 'png' })
+      return dataUrl
+    }
+
+    case 'region': {
+      const dataUrl = await chrome.tabs.captureVisibleTab({ format: 'png' })
+      if (request.region) {
+        return cropImageData(dataUrl, request.region)
+      }
       return dataUrl
     }
 

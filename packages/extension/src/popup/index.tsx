@@ -7,10 +7,25 @@ async function triggerCapture(mode: CaptureMode) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
   if (!tab.id) return
 
+  // For region mode: close popup first so it doesn't overlap the region selector,
+  // then delegate the full flow (select → capture → crop → show editor) to the service worker.
+  if (mode === 'region') {
+    chrome.runtime.sendMessage({
+      type: 'CAPTURE',
+      tabId: tab.id,
+      payload: { mode },
+    })
+    window.close()
+    return
+  }
+
   const response = await chrome.runtime.sendMessage({
     type: 'CAPTURE',
     tabId: tab.id,
-    payload: { mode },
+    payload: {
+      mode,
+      delayMs: mode === 'delayed' ? 3000 : undefined,
+    },
   })
 
   if (response.ok) {

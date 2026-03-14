@@ -1,5 +1,6 @@
 // packages/storage/src/providers/local.ts
 import type { StorageProvider, UploadResult } from '../interface'
+import { dataUrlToBlob } from '@capture/core'
 import type { CaptureMeta, CaptureRecord } from '@capture/core'
 
 const DB_NAME = 'capture-local-storage'
@@ -65,7 +66,7 @@ export class LocalProvider implements StorageProvider {
         req.onsuccess = () => {
           const records = req.result.map((r: any) => ({
             ...r,
-            blob: new Blob([r.dataUrl], { type: 'image/png' }),
+            blob: dataUrlToBlob(r.dataUrl),
           }))
           resolve(records.sort((a: CaptureRecord, b: CaptureRecord) => b.capturedAt - a.capturedAt))
         }
