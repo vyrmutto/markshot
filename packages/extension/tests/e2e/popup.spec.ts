@@ -32,17 +32,19 @@ async function loadExtension() {
 test('popup renders all capture mode buttons', async () => {
   const { context, extensionId } = await loadExtension()
 
-  expect(extensionId).not.toBe('')
+  try {
+    expect(extensionId).not.toBe('')
 
-  const popupPage = await context.newPage()
-  await popupPage.goto(`chrome-extension://${extensionId}/src/popup/index.html`)
-  await popupPage.waitForLoadState('domcontentloaded')
+    const popupPage = await context.newPage()
+    await popupPage.goto(`chrome-extension://${extensionId}/src/popup/index.html`)
+    await popupPage.waitForLoadState('domcontentloaded')
 
-  await expect(popupPage.getByText('Visible Area')).toBeVisible()
-  await expect(popupPage.getByText('Full Page')).toBeVisible()
-  await expect(popupPage.getByText('Select Region')).toBeVisible()
-  await expect(popupPage.getByText('Element')).toBeVisible()
-  await expect(popupPage.getByText('Delayed')).toBeVisible()
-
-  await context.close()
+    await expect(popupPage.getByText('Visible Area')).toBeVisible()
+    await expect(popupPage.getByText('Full Page')).toBeVisible()
+    await expect(popupPage.getByText('Select Region')).toBeVisible()
+    await expect(popupPage.getByText('Element')).toBeVisible()
+    await expect(popupPage.getByText('Delayed')).toBeVisible()
+  } finally {
+    await context.close()
+  }
 })
