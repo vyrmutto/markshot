@@ -1,5 +1,5 @@
-// packages/extension/src/background/service-worker.ts
 import { handleCapture, type CaptureRequest } from './capture-handler'
+import { startTabRecording, stopRecording } from './record-handler'
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'CAPTURE') {
@@ -11,11 +11,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     handleCapture(tabId, message.payload as CaptureRequest)
       .then(dataUrl => sendResponse({ ok: true, dataUrl }))
       .catch(err => sendResponse({ ok: false, error: err.message }))
-    return true // async response
+    return true
   }
+
   if (message.type === 'START_RECORD') {
-    console.warn('START_RECORD not yet implemented')
-    sendResponse({ ok: false, error: 'Not implemented' })
+    if (message.payload?.type === 'tab') {
+      startTabRecording(message.tabId)
+        .then(() => sendResponse({ ok: true }))
+        .catch(err => sendResponse({ ok: false, error: err.message }))
+      return true
+    }
+    sendResponse({ ok: false, error: 'Only tab recording is supported via START_RECORD' })
+    return true
+  }
+
+  if (message.type === 'STOP_RECORD') {
+    stopRecording()
+      .then(blob => blob.arrayBuffer())
+      .then(buf => sendResponse({ ok: true, buffer: buf }))
+      .catch(err => sendResponse({ ok: false, error: err.message }))
     return true
   }
 })
