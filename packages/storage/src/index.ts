@@ -2,4 +2,5 @@
 export * from './interface'
 export * from './registry'
 export * from './providers/local'
-// additional providers added below as each is implemented
+export * from './providers/imgur'
+export * from './providers/s3'
