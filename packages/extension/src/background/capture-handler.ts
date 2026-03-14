@@ -38,20 +38,22 @@ export async function handleCapture(
       const { scrollHeight } = scrollInfo[0].result as { scrollHeight: number; scrollTop: number }
       const steps = Math.ceil(scrollHeight / height)
 
-      for (let i = 0; i < steps; i++) {
+      try {
+        for (let i = 0; i < steps; i++) {
+          await chrome.scripting.executeScript({
+            target: { tabId },
+            func: (y: number) => window.scrollTo(0, y),
+            args: [i * height],
+          })
+          await new Promise(r => setTimeout(r, 150))
+          frames.push(await chrome.tabs.captureVisibleTab({ format: 'png' }))
+        }
+      } finally {
         await chrome.scripting.executeScript({
           target: { tabId },
-          func: (y: number) => window.scrollTo(0, y),
-          args: [i * height],
+          func: () => window.scrollTo(0, 0),
         })
-        await new Promise(r => setTimeout(r, 150))
-        frames.push(await chrome.tabs.captureVisibleTab({ format: 'png' }))
       }
-
-      await chrome.scripting.executeScript({
-        target: { tabId },
-        func: () => window.scrollTo(0, 0),
-      })
 
       return stitchFrames(frames, width, height)
     }

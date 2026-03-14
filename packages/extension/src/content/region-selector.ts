@@ -2,7 +2,7 @@
 import type { Region } from '@capture/core'
 
 export function startRegionSelector(): Promise<Region> {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const overlay = document.createElement('div')
     overlay.id = '__capture-region-overlay'
     Object.assign(overlay.style, {
@@ -20,10 +20,6 @@ export function startRegionSelector(): Promise<Region> {
     })
     document.body.appendChild(selection)
 
-    const onMouseDown = (e: MouseEvent) => {
-      startX = e.clientX; startY = e.clientY
-    }
-
     const onMouseMove = (e: MouseEvent) => {
       const x = Math.min(e.clientX, startX)
       const y = Math.min(e.clientY, startY)
@@ -38,6 +34,7 @@ export function startRegionSelector(): Promise<Region> {
       overlay.removeEventListener('mousedown', onMouseDown)
       overlay.removeEventListener('mousemove', onMouseMove)
       overlay.removeEventListener('mouseup', onMouseUp)
+      document.removeEventListener('keydown', onKeyDown)
       overlay.remove()
       selection.remove()
 
@@ -50,8 +47,26 @@ export function startRegionSelector(): Promise<Region> {
       })
     }
 
+    const onMouseDown = (e: MouseEvent) => {
+      startX = e.clientX
+      startY = e.clientY
+      overlay.addEventListener('mousemove', onMouseMove)
+    }
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        overlay.removeEventListener('mousedown', onMouseDown)
+        overlay.removeEventListener('mousemove', onMouseMove)
+        overlay.removeEventListener('mouseup', onMouseUp)
+        document.removeEventListener('keydown', onKeyDown)
+        overlay.remove()
+        selection.remove()
+        reject(new Error('Region selection cancelled'))
+      }
+    }
+
     overlay.addEventListener('mousedown', onMouseDown)
-    overlay.addEventListener('mousemove', onMouseMove)
     overlay.addEventListener('mouseup', onMouseUp)
+    document.addEventListener('keydown', onKeyDown)
   })
 }

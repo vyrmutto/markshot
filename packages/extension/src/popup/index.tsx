@@ -21,10 +21,13 @@ async function triggerCapture(mode: CaptureMode) {
         dataUrl: response.dataUrl,
         width: img.naturalWidth,
         height: img.naturalHeight,
+        mode,
       })
       window.close()
     }
     img.src = response.dataUrl
+  } else {
+    console.error('Capture failed:', response.error)
   }
 }
 

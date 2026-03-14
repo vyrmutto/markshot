@@ -6,7 +6,9 @@ import { LocalProvider } from '@capture/storage'
 
 let overlayRoot: ReturnType<typeof createRoot> | null = null
 
-function injectEditor(dataUrl: string, width: number, height: number) {
+const storage = new LocalProvider()
+
+function injectEditor(dataUrl: string, width: number, height: number, mode: string = 'visible') {
   const container = document.createElement('div')
   container.id = '__capture-editor-root'
   Object.assign(container.style, {
@@ -14,8 +16,6 @@ function injectEditor(dataUrl: string, width: number, height: number) {
     background: 'rgba(0,0,0,0.6)',
   })
   document.body.appendChild(container)
-
-  const storage = new LocalProvider()
 
   const handleSave = async (blob: Blob) => {
     // Save to local storage + trigger download
@@ -26,13 +26,15 @@ function injectEditor(dataUrl: string, width: number, height: number) {
       title: document.title,
       width,
       height,
-      mode: 'visible',
+      mode: mode as import('@capture/core').CaptureMode,
     })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = `capture-${Date.now()}.png`
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
@@ -56,6 +58,6 @@ function injectEditor(dataUrl: string, width: number, height: number) {
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === 'SHOW_EDITOR') {
-    injectEditor(message.dataUrl, message.width, message.height)
+    injectEditor(message.dataUrl, message.width, message.height, message.mode ?? 'visible')
   }
 })
