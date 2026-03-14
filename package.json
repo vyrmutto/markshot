@@ -1,6 +1,9 @@
 {
   "name": "my-browser-screen-capture",
   "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["canvas", "esbuild", "sharp"]
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

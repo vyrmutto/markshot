@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#ff4757"/>
+  <g stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- camera body -->
+    <path d="M24 44h80a6 6 0 0 1 6 6v40a6 6 0 0 1-6 6H24a6 6 0 0 1-6-6V50a6 6 0 0 1 6-6z"/>
+    <!-- lens notch top -->
+    <path d="M46 44l6-12h24l6 12"/>
+    <!-- lens circle -->
+    <circle cx="64" cy="70" r="16"/>
+    <circle cx="64" cy="70" r="8" fill="white" stroke="none"/>
+    <!-- flash dot -->
+    <circle cx="94" cy="56" r="4" fill="white" stroke="none"/>
+  </g>
+</svg>
