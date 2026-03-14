@@ -4,10 +4,18 @@ export class ScreenRecorder {
   private chunks: Blob[] = []
 
   async start(stream: MediaStream): Promise<void> {
+    if (this.isRecording) {
+      throw new Error('Already recording')
+    }
     this.chunks = []
-    this.mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9',
-    })
+
+    const mimeType = [
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+    ].find(t => MediaRecorder.isTypeSupported(t)) ?? ''
+
+    this.mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {})
     this.mediaRecorder.ondataavailable = e => {
       if (e.data.size > 0) this.chunks.push(e.data)
     }
@@ -18,7 +26,9 @@ export class ScreenRecorder {
     return new Promise((resolve, reject) => {
       if (!this.mediaRecorder) return reject(new Error('Not recording'))
       this.mediaRecorder.onstop = () => {
-        resolve(new Blob(this.chunks, { type: 'video/webm' }))
+        const blob = new Blob(this.chunks, { type: this.mediaRecorder?.mimeType ?? 'video/webm' })
+        this.mediaRecorder = null
+        resolve(blob)
       }
       this.mediaRecorder.stop()
     })

@@ -1,23 +1,22 @@
 // packages/ui/src/settings/SettingsPage.tsx
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { StorageConfig } from './StorageConfig'
 import { LocalProvider, ImgurProvider, S3Provider } from '@capture/storage'
-import type { StorageProvider } from '@capture/storage'
-
-const PROVIDERS: StorageProvider[] = [
-  new LocalProvider(),
-  new ImgurProvider(),
-  new S3Provider(),
-]
 
 export function SettingsPage() {
-  const [activeId, setActiveId] = useState('local')
+  const providers = useMemo(() => [
+    new LocalProvider(),
+    new ImgurProvider(),
+    new S3Provider(),
+  ], [])
+
+  const [activeId, setActiveId] = useState(() => providers[0].id)
 
   return (
     <div className="settings-page">
       <h1>Settings</h1>
       <StorageConfig
-        providers={PROVIDERS}
+        providers={providers}
         activeProviderId={activeId}
         onProviderChange={setActiveId}
       />

@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'START_RECORD') {
     if (message.payload?.type === 'tab') {
-      startTabRecording(message.tabId)
+      startTabRecording()
         .then(() => sendResponse({ ok: true }))
         .catch(err => sendResponse({ ok: false, error: err.message }))
       return true

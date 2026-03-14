@@ -3,8 +3,10 @@ import { ScreenRecorder } from '@capture/core'
 
 const recorder = new ScreenRecorder()
 
-export async function startTabRecording(tabId: number): Promise<void> {
-  const stream = await chrome.tabCapture.capture({ audio: true, video: true })
+export async function startTabRecording(): Promise<void> {
+  const stream = await new Promise<MediaStream | null>(resolve =>
+    chrome.tabCapture.capture({ audio: true, video: true }, resolve),
+  )
   if (!stream) throw new Error('Tab capture failed')
   await recorder.start(stream)
 }

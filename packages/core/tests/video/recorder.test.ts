@@ -36,7 +36,9 @@ describe('ScreenRecorder', () => {
     recorder = new ScreenRecorder()
     const chunk = new Blob(['data'], { type: 'video/webm' })
     mockMR = makeMediaRecorder([chunk])
-    vi.stubGlobal('MediaRecorder', vi.fn(() => mockMR))
+    const MockMediaRecorder = vi.fn(() => mockMR) as unknown as typeof MediaRecorder
+    MockMediaRecorder.isTypeSupported = vi.fn(() => true)
+    vi.stubGlobal('MediaRecorder', MockMediaRecorder)
   })
 
   it('starts recording on a stream', async () => {
@@ -52,5 +54,16 @@ describe('ScreenRecorder', () => {
 
   it('throws when stopping without starting', async () => {
     await expect(recorder.stop()).rejects.toThrow('Not recording')
+  })
+
+  it('throws when start is called while already recording', async () => {
+    await recorder.start(makeStream())
+    await expect(recorder.start(makeStream())).rejects.toThrow('Already recording')
+  })
+
+  it('isRecording is false after stop', async () => {
+    await recorder.start(makeStream())
+    await recorder.stop()
+    expect(recorder.isRecording).toBe(false)
   })
 })
