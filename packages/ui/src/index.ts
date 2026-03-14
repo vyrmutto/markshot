@@ -1,2 +1,7 @@
-// populated in Chunk 4 tasks
-export {}
+export * from './popup/Popup'
+export * from './popup/CaptureTab'
+export * from './popup/HistoryTab'
+export * from './annotation/useUndoRedo'
+export * from './annotation/Toolbar'
+export * from './annotation/Canvas'
+export * from './annotation/AnnotationEditor'
