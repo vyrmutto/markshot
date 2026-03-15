@@ -1,6 +1,7 @@
 // packages/extension/src/popup/index.tsx
 import { createRoot } from 'react-dom/client'
 import { Popup } from '@capture/ui'
+import '@capture/ui/style.css'
 import type { CaptureMode } from '@capture/core'
 
 async function triggerCapture(mode: CaptureMode) {

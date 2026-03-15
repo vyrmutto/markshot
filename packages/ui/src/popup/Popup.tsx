@@ -23,7 +23,7 @@ export function Popup({ onCapture, onRecord, history = [], onDeleteHistory, onCo
       <header className="popup-header">
         <Camera size={28} color="white" className="popup-logo" aria-hidden />
         <div>
-          <div className="popup-title">Screen Capture</div>
+          <div className="popup-title">Markshot</div>
           <div className="popup-subtitle">Open source · Local first</div>
         </div>
       </header>
