@@ -30,4 +30,30 @@ describe('ImgurProvider', () => {
       }),
     ).rejects.toThrow('Imgur upload failed')
   })
+
+  it('configure: sets clientId used in Authorization header', async () => {
+    const provider = new ImgurProvider()
+    provider.configure({ clientId: 'my-custom-client-id' })
+    const blob = new Blob(['x'], { type: 'image/png' })
+    await provider.upload(blob, { id: '1', capturedAt: 0, url: '', title: '', width: 0, height: 0, mode: 'visible' })
+    const fetchCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]
+    expect(fetchCall[1].headers.Authorization).toBe('Client-ID my-custom-client-id')
+  })
+
+  it('getHistory: returns empty array', async () => {
+    const provider = new ImgurProvider()
+    const history = await provider.getHistory()
+    expect(history).toEqual([])
+  })
+
+  it('delete: resolves without throwing', async () => {
+    const provider = new ImgurProvider()
+    await expect(provider.delete('abc123')).resolves.toBeUndefined()
+  })
+
+  it('getShareUrl: returns imgur share URL for given id', async () => {
+    const provider = new ImgurProvider()
+    const url = await provider.getShareUrl('xyz789')
+    expect(url).toBe('https://imgur.com/xyz789')
+  })
 })

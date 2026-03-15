@@ -28,4 +28,18 @@ describe('LocalProvider', () => {
     const history = await provider.getHistory()
     expect(history).toEqual([])
   })
+
+  it('configure: accepts settings without throwing', () => {
+    expect(() => provider.configure({ some: 'setting' })).not.toThrow()
+  })
+
+  it('delete: resolves without throwing', async () => {
+    await expect(provider.delete('any-id')).resolves.toBeUndefined()
+  })
+
+  it('delete after upload: resolves without throwing', async () => {
+    const blob = new Blob(['data'], { type: 'image/png' })
+    await provider.upload(blob, meta)
+    await expect(provider.delete(meta.id)).resolves.toBeUndefined()
+  })
 })
