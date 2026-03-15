@@ -1,3 +1,9 @@
 .superpowers/
 dist/
 node_modules/
+
+# Turborepo
+.turbo/
+
+# pnpm
+.npmrc
