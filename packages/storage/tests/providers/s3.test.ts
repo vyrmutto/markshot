@@ -18,7 +18,7 @@ describe('S3Provider', () => {
     ).not.toThrow()
   })
 
-  it('configure: stores endpoint and bucket', async () => {
+  it('configure: satisfies configuration guard so upload proceeds past the not-configured check', async () => {
     const provider = new S3Provider()
     provider.configure({ endpoint: 'https://s3.example.com', bucket: 'my-bucket' })
     await expect(
