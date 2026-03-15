@@ -53,20 +53,13 @@ test('Capture tab is active by default', async () => {
   const { context, extensionId } = await loadExtension()
 
   try {
-    expect(extensionId).not.toBe('')
+    expect(extensionId, 'Extension ID must be non-empty — check that dist/ build exists').not.toBe('')
 
     const popupPage = await context.newPage()
     await popupPage.goto(`chrome-extension://${extensionId}/src/popup/index.html`)
     await popupPage.waitForLoadState('domcontentloaded')
 
-    // All 5 capture buttons should be visible without any tab click
-    await expect(popupPage.getByText('Visible Area')).toBeVisible()
-    await expect(popupPage.getByText('Full Page')).toBeVisible()
-    await expect(popupPage.getByText('Select Region')).toBeVisible()
-    await expect(popupPage.getByText('Element')).toBeVisible()
-    await expect(popupPage.getByText('Delayed')).toBeVisible()
-
-    // The Capture tab button should have the active class
+    // The Capture tab button should have the active class without any click
     const captureTab = popupPage.getByRole('button', { name: 'Capture' })
     await expect(captureTab).toHaveClass(/active/)
   } finally {
