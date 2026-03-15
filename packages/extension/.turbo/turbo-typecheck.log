@@ -1,0 +1,4 @@
+
+> @capture/extension@0.1.0 typecheck /Users/vysina/my_workspace/my-browser-screen-capture/packages/extension
+> tsc --noEmit
+

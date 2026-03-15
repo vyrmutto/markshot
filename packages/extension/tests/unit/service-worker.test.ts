@@ -43,8 +43,8 @@ describe('service-worker', () => {
   })
 
   beforeEach(() => {
-    // Only clear call history, not implementations (clearAllMocks preserves implementations in vitest)
-    // But to be safe, re-set all implementations after clearing
+    // clearAllMocks() clears call history and queued return values but preserves mockImplementation().
+    // Do NOT switch to resetAllMocks() — that would remove the addListener implementation.
     vi.clearAllMocks()
     ;(chrome.tabs.sendMessage as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
     ;(chrome.scripting.executeScript as ReturnType<typeof vi.fn>).mockResolvedValue([{ result: undefined }])
@@ -110,6 +110,10 @@ describe('service-worker', () => {
     expect(handleCapture).toHaveBeenCalledWith(
       1,
       expect.objectContaining({ mode: 'region', region })
+    )
+    expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({ type: 'SHOW_EDITOR', mode: 'region' })
     )
     expect(result).toEqual({ ok: true, dataUrl: 'data:image/png;captured' })
   })

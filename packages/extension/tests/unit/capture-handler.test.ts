@@ -62,21 +62,11 @@ describe('capture-handler', () => {
     const frameUrl = 'data:image/png;frame'
     ;(chrome.tabs.captureVisibleTab as ReturnType<typeof vi.fn>).mockResolvedValue(frameUrl)
 
-    // executeScript mock: 1st call = getViewport, 2nd call = scrollInfo, 3rd/4th = scroll steps, 5th = restore
-    let executeScriptCallCount = 0
-    ;(chrome.scripting.executeScript as ReturnType<typeof vi.fn>).mockImplementation(async () => {
-      executeScriptCallCount++
-      if (executeScriptCallCount === 1) {
-        // getViewport
-        return [{ result: { width: 800, height: 600 } }]
-      }
-      if (executeScriptCallCount === 2) {
-        // scrollInfo
-        return [{ result: { scrollHeight: 1200, scrollTop: 0 } }]
-      }
-      // scroll steps and restore
-      return [{ result: undefined }]
-    })
+    // executeScript mock: 1st call = getViewport, 2nd call = scrollInfo, remaining = scroll steps + restore
+    ;(chrome.scripting.executeScript as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce([{ result: { width: 800, height: 600 } }])   // getViewport call
+      .mockResolvedValueOnce([{ result: { scrollHeight: 1200, scrollTop: 0 } }])  // scrollInfo call
+      .mockResolvedValue([{ result: undefined }])  // scroll step(s) + restore scroll
 
     const result = await handleCapture(1, { mode: 'fullpage' })
 
@@ -86,22 +76,24 @@ describe('capture-handler', () => {
     expect(result).toBe('data:image/png;stitched')
   })
 
-  it('delayed mode: waits delayMs before capturing', async () => {
-    vi.useFakeTimers()
-    const mockUrl = 'data:image/png;delayed'
-    ;(chrome.tabs.captureVisibleTab as ReturnType<typeof vi.fn>).mockResolvedValue(mockUrl)
+  describe('delayed mode', () => {
+    beforeEach(() => vi.useFakeTimers())
+    afterEach(() => vi.useRealTimers())
 
-    const capturePromise = handleCapture(1, { mode: 'delayed', delayMs: 50 })
+    it('waits delayMs before capturing', async () => {
+      const mockUrl = 'data:image/png;delayed'
+      ;(chrome.tabs.captureVisibleTab as ReturnType<typeof vi.fn>).mockResolvedValue(mockUrl)
 
-    // Advance timers by the delay amount
-    await vi.advanceTimersByTimeAsync(50)
+      const capturePromise = handleCapture(1, { mode: 'delayed', delayMs: 50 })
 
-    const result = await capturePromise
+      // Advance timers by the delay amount
+      await vi.advanceTimersByTimeAsync(50)
 
-    expect(chrome.tabs.captureVisibleTab).toHaveBeenCalledTimes(1)
-    expect(result).toBe(mockUrl)
+      const result = await capturePromise
 
-    vi.useRealTimers()
+      expect(chrome.tabs.captureVisibleTab).toHaveBeenCalledTimes(1)
+      expect(result).toBe(mockUrl)
+    })
   })
 
   it('unknown mode: throws Unknown capture mode error', async () => {

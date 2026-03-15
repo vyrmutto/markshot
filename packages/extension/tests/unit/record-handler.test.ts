@@ -72,4 +72,27 @@ describe('record-handler', () => {
     mockRecorder.isRecording = true
     expect(mod.isRecording()).toBe(true)
   })
+
+  it('stopRecording throws when called before startTabRecording', async () => {
+    // Use a mock that faithfully rejects when stop() is called before start()
+    const mockRecorderThrowing = {
+      isRecording: false,
+      start: vi.fn(async () => { mockRecorderThrowing.isRecording = true }),
+      stop: vi.fn(async () => { throw new Error('Not recording') }),
+    }
+    vi.doMock('@capture/core', () => ({
+      ScreenRecorder: vi.fn(() => mockRecorderThrowing),
+    }))
+    const { stopRecording } = await import('../../src/background/record-handler')
+    await expect(stopRecording()).rejects.toThrow('Not recording')
+  })
+
+  it('isRecording returns true after startTabRecording', async () => {
+    ;(chrome.tabCapture.capture as ReturnType<typeof vi.fn>).mockImplementation((_opts: unknown, cb: (s: MediaStream | null) => void) =>
+      cb({} as MediaStream)
+    )
+    const { startTabRecording, isRecording } = await import('../../src/background/record-handler')
+    await startTabRecording()
+    expect(isRecording()).toBe(true)
+  })
 })

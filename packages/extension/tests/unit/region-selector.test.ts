@@ -54,8 +54,6 @@ describe('region-selector', () => {
     await promise
 
     expect(document.getElementById('__capture-region-overlay')).toBeNull()
-    const overlays = document.querySelectorAll('[id="__capture-region-overlay"]')
-    expect(overlays.length).toBe(0)
   })
 
   it('Escape key rejects with Region selection cancelled', async () => {
