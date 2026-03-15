@@ -2,6 +2,25 @@
 
 Open-source Chrome extension for screen capture, annotation, and recording. No SaaS, no paywalls — all features work locally in your browser.
 
+## Install (from source)
+
+**Prerequisites:** Node.js 20+, pnpm 10+
+
+```bash
+git clone https://github.com/vyrmutto/markshot.git
+cd markshot
+pnpm install
+pnpm build
+```
+
+Then in Chrome:
+
+1. Open `chrome://extensions/`
+2. Enable **Developer mode** (toggle, top-right)
+3. Click **Load unpacked** → select `packages/extension/dist/`
+
+> Chrome Web Store listing coming soon.
+
 ## Features
 
 - **Capture** — Visible area, full page, region select, element picker, delayed capture
@@ -9,32 +28,13 @@ Open-source Chrome extension for screen capture, annotation, and recording. No S
 - **Record** — Tab recording, screen recording (MediaRecorder with VP9/VP8 fallback)
 - **Storage** — Local-first (IndexedDB); optionally bring your own Imgur, S3-compatible (AWS S3, Cloudflare R2, MinIO), Google Drive, or Dropbox credentials
 
-## Install
-
-> Chrome Web Store listing coming soon.
-
-In the meantime, load the unpacked extension from [GitHub Releases](https://github.com/vyrmutto/markshot/releases):
-
-1. Download and unzip the latest `markshot-dist.zip`
-2. Open `chrome://extensions/` → enable **Developer mode**
-3. Click **Load unpacked** → select the unzipped folder
-
 ## Development
 
-**Prerequisites:** Node.js 20+, pnpm 10+
-
 ```bash
-git clone https://github.com/vyrmutto/markshot.git
-cd markshot
-
-pnpm install
-pnpm build        # production build → packages/extension/dist/
 pnpm dev          # watch mode (rebuilds on change)
 pnpm test         # run all unit tests (Vitest)
 pnpm typecheck    # TypeScript type checking
 ```
-
-Load `packages/extension/dist/` as an unpacked extension in `chrome://extensions/`.
 
 ### Running E2E tests
 
